@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 type FormState = {
   name: string;
@@ -10,6 +11,8 @@ type FormState = {
 };
 
 export default function RegisterPage() {
+  const router = useRouter();
+
   const [form, setForm] = useState<FormState>({
     name: "",
     age: "",
@@ -19,17 +22,14 @@ export default function RegisterPage() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (loading) return;
 
     setError(null);
-    setSuccess(false);
 
-    // ✅ フロントバリデーション
+    // ✅ バリデーション
     if (!form.name.trim()) {
       setError("名前を入力してください");
       return;
@@ -70,15 +70,16 @@ export default function RegisterPage() {
         return;
       }
 
-      setSuccess(true);
+      // ✅ ここが重要：IDを使ってQRページへ遷移
+      const id = result.data?.id;
 
-      // リセット
-      setForm({
-        name: "",
-        age: "",
-        has_license: false,
-        license_grade: "",
-      });
+      if (!id) {
+        setError("ID取得に失敗しました");
+        return;
+      }
+
+      router.push(`/qr/${id}`);
+
     } catch (err) {
       console.error("Network Error:", err);
       setError("通信エラーが発生しました");
@@ -152,12 +153,6 @@ export default function RegisterPage() {
           {error && (
             <div className="text-red-500 text-sm">
               {error}
-            </div>
-          )}
-
-          {success && (
-            <div className="text-green-600 text-sm">
-              登録が完了しました
             </div>
           )}
 
