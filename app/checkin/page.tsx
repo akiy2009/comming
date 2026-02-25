@@ -1,44 +1,76 @@
 "use client";
-import { Html5QrcodeScanner } from "html5-qrcode";
-import { useEffect, useRef } from "react";
+
+import { useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 
 export default function Checkin() {
-  const scannerRef = useRef<Html5QrcodeScanner | null>(null);
-  const isScanningRef = useRef(true);
+  const scannerRef = useRef<any>(null);
+  const [result, setResult] = useState<string | null>(null);
+  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
 
   useEffect(() => {
-    const scanner = new Html5QrcodeScanner("reader", {
-      fps: 10,
-      qrbox: 250,
-    });
+    let mounted = true;
 
-    scannerRef.current = scanner;
+    const startScanner = async () => {
+      const { Html5QrcodeScanner } = await import("html5-qrcode");
 
-    scanner.render(async (decodedText) => {
-      if (!isScanningRef.current) return; // 🔒 連続防止
-      isScanningRef.current = false;
+      if (!mounted) return;
 
-      const res = await fetch("/api/checkin", {
-        method: "POST",
-        body: JSON.stringify({ decodedText }),
-      });
+      const scanner = new Html5QrcodeScanner(
+        "reader",
+        {
+          fps: 10,
+          qrbox: 250,
+        },
+        false // ← これが必要（ビルドエラー対策）
+      );
 
-      const data = await res.json();
+      scanner.render(
+        (decodedText: string) => {
+          if (!result) {
+            setResult(decodedText);
+            setStatus("success");
 
-      if (data.success) {
-        alert("チェックイン完了");
-      } else {
-        alert(data.error);
-      }
+            // ここでチェックインAPI叩いてもOK
+            console.log("Scanned:", decodedText);
+          }
+        },
+        () => {}
+      );
 
-      // 🔥 カメラ停止（重要）
-      await scanner.clear();
-    });
+      scannerRef.current = scanner;
+    };
+
+    startScanner();
 
     return () => {
-      scanner.clear().catch(() => {});
+      mounted = false;
+      if (scannerRef.current) {
+        scannerRef.current.clear().catch(() => {});
+      }
     };
-  }, []);
+  }, [result]);
 
-  return <div id="reader" />;
+  return (
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-6 space-y-6">
+      <h1 className="text-2xl font-bold">チェックイン</h1>
+
+      <div
+        id="reader"
+        className="w-full max-w-md bg-white rounded-xl shadow-md p-4"
+      />
+
+      {status === "success" && result && (
+        <div className="bg-green-100 text-green-700 px-4 py-3 rounded-lg text-sm">
+          読み取り成功：{result}
+        </div>
+      )}
+
+      {status === "error" && (
+        <div className="bg-red-100 text-red-700 px-4 py-3 rounded-lg text-sm">
+          読み取り失敗
+        </div>
+      )}
+    </div>
+  );
 }
