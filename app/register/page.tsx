@@ -2,195 +2,173 @@
 
 import { useState } from "react";
 
-type FormType = {
+type FormState = {
   name: string;
-  age: number;
+  age: string;
   has_license: boolean;
   license_grade: string;
 };
 
-export default function Register() {
-  const [form, setForm] = useState<FormType>({
+export default function RegisterPage() {
+  const [form, setForm] = useState<FormState>({
     name: "",
-    age: 0,
+    age: "",
     has_license: false,
     license_grade: "",
   });
 
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
-  const handleSubmit = async () => {
-    setError("");
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
+    if (loading) return;
+
+    setError(null);
+    setSuccess(false);
+
+    // ✅ フロントバリデーション
     if (!form.name.trim()) {
-      return setError("名前を入力してください");
+      setError("名前を入力してください");
+      return;
     }
 
-    if (form.age <= 0) {
-      return setError("正しい年齢を入力してください");
+    if (!form.age || isNaN(Number(form.age))) {
+      setError("正しい年齢を入力してください");
+      return;
     }
 
     if (form.has_license && !form.license_grade) {
-      return setError("取得級を選択してください");
+      setError("資格保有者は級を選択してください");
+      return;
     }
 
     try {
       setLoading(true);
 
-      const payload = {
-        ...form,
-        license_grade: form.has_license ? form.license_grade : null,
-      };
-
       const res = await fetch("/api/register", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: form.name.trim(),
+          age: Number(form.age),
+          has_license: form.has_license,
+          license_grade: form.has_license
+            ? form.license_grade
+            : null,
+        }),
       });
 
+      const result = await res.json();
+
       if (!res.ok) {
-        throw new Error("登録に失敗しました");
+        setError(result.error || "登録エラーが発生しました");
+        return;
       }
 
-      const data = await res.json();
-      window.location.href = `/qr/${data.id}`;
+      setSuccess(true);
+
+      // リセット
+      setForm({
+        name: "",
+        age: "",
+        has_license: false,
+        license_grade: "",
+      });
     } catch (err) {
-      setError("登録エラーが発生しました");
+      console.error("Network Error:", err);
+      setError("通信エラーが発生しました");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center p-6">
-      <div className="w-full max-w-md bg-white rounded-3xl shadow-xl p-8 space-y-6">
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
+      <div className="bg-white p-8 rounded-2xl shadow-md w-full max-w-md space-y-6">
+        <h1 className="text-2xl font-bold text-center">
+          参加者登録
+        </h1>
 
-        <div className="text-center">
-          <h1 className="text-2xl font-bold">事前登録</h1>
-          <p className="text-sm text-gray-500">
-            入場用QRコードを発行します
-          </p>
-        </div>
-
-        {error && (
-          <div className="bg-red-100 text-red-600 px-4 py-2 rounded-lg text-sm">
-            {error}
-          </div>
-        )}
-
-        {/* 名前 */}
-        <div>
-          <label className="text-sm font-medium text-gray-600">
-            名前
-          </label>
+        <form onSubmit={handleSubmit} className="space-y-4">
           <input
-            className="w-full border rounded-xl p-3 mt-1 focus:ring-2 focus:ring-black outline-none"
+            type="text"
+            placeholder="名前"
             value={form.name}
             onChange={(e) =>
               setForm({ ...form, name: e.target.value })
             }
+            className="w-full border rounded-lg px-3 py-2"
           />
-        </div>
 
-        {/* 年齢 */}
-        <div>
-          <label className="text-sm font-medium text-gray-600">
-            年齢
-          </label>
           <input
             type="number"
-            className="w-full border rounded-xl p-3 mt-1 focus:ring-2 focus:ring-black outline-none"
-            value={form.age === 0 ? "" : form.age}
+            placeholder="年齢"
+            value={form.age}
             onChange={(e) =>
-              setForm({
-                ...form,
-                age: Number(e.target.value),
-              })
+              setForm({ ...form, age: e.target.value })
             }
+            className="w-full border rounded-lg px-3 py-2"
           />
-        </div>
 
-        {/* 資格有無 */}
-        <div className="space-y-3">
-          <label className="text-sm font-medium text-gray-600">
-            アマチュア無線資格
-          </label>
-
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              type="button"
-              onClick={() =>
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={form.has_license}
+              onChange={(e) =>
                 setForm({
                   ...form,
-                  has_license: true,
-                })
-              }
-              className={`py-3 rounded-xl border transition ${
-                form.has_license
-                  ? "bg-black text-white border-black"
-                  : "hover:bg-gray-100"
-              }`}
-            >
-              持っている
-            </button>
-
-            <button
-              type="button"
-              onClick={() =>
-                setForm({
-                  ...form,
-                  has_license: false,
+                  has_license: e.target.checked,
                   license_grade: "",
                 })
               }
-              className={`py-3 rounded-xl border transition ${
-                !form.has_license
-                  ? "bg-black text-white border-black"
-                  : "hover:bg-gray-100"
-              }`}
+            />
+            資格を持っている
+          </label>
+
+          {form.has_license && (
+            <select
+              value={form.license_grade}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  license_grade: e.target.value,
+                })
+              }
+              className="w-full border rounded-lg px-3 py-2"
             >
-              持っていない
-            </button>
-          </div>
-        </div>
+              <option value="">級を選択</option>
+              <option value="1級">1級</option>
+              <option value="2級">2級</option>
+              <option value="3級">3級</option>
+              <option value="4級">4級</option>
+            </select>
+          )}
 
-        {/* 級選択 */}
-        {form.has_license && (
-          <div className="space-y-3">
-            <label className="text-sm font-medium text-gray-600">
-              取得級
-            </label>
-
-            <div className="grid grid-cols-2 gap-3">
-              {["1級", "2級", "3級", "4級"].map((grade) => (
-                <button
-                  key={grade}
-                  type="button"
-                  onClick={() =>
-                    setForm({ ...form, license_grade: grade })
-                  }
-                  className={`py-3 rounded-xl border font-semibold transition ${
-                    form.license_grade === grade
-                      ? "bg-black text-white border-black"
-                      : "hover:bg-gray-100"
-                  }`}
-                >
-                  {grade}
-                </button>
-              ))}
+          {error && (
+            <div className="text-red-500 text-sm">
+              {error}
             </div>
-          </div>
-        )}
+          )}
 
-        {/* 送信ボタン */}
-        <button
-          onClick={handleSubmit}
-          disabled={loading}
-          className="w-full bg-black text-white py-3 rounded-xl font-semibold hover:opacity-80 active:scale-95 transition"
-        >
-          {loading ? "登録中..." : "QRコードを発行する"}
-        </button>
+          {success && (
+            <div className="text-green-600 text-sm">
+              登録が完了しました
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-black text-white py-2 rounded-lg disabled:opacity-50"
+          >
+            {loading ? "登録中..." : "登録する"}
+          </button>
+        </form>
       </div>
     </div>
   );

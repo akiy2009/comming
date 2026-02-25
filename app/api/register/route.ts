@@ -3,30 +3,39 @@ import { createClient } from "@supabase/supabase-js";
 
 export async function POST(req: NextRequest) {
   try {
-    // 🔐 環境変数チェック
-    if (
-      !process.env.NEXT_PUBLIC_SUPABASE_URL ||
-      !process.env.SUPABASE_SERVICE_ROLE_KEY
-    ) {
-      console.error("Missing Supabase environment variables");
+    // 環境変数チェック
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!supabaseUrl || !serviceKey) {
+      console.error("ENV ERROR: Supabase keys missing");
       return NextResponse.json(
-        { error: "サーバー設定エラー" },
+        { error: "サーバー設定エラー（ENV未設定）" },
         { status: 500 }
       );
     }
 
     const body = await req.json();
 
-    const name: string = body.name;
-    const age: number = Number(body.age);
-    const has_license: boolean = Boolean(body.has_license);
-    const license_grade: string | null =
-      body.license_grade ?? null;
+    const name = body.name?.trim();
+    const age = Number(body.age);
+    const has_license = Boolean(body.has_license);
+    const license_grade =
+      body.license_grade && body.license_grade !== ""
+        ? body.license_grade
+        : null;
 
-    // ✅ バリデーション
-    if (!name || isNaN(age)) {
+    // バリデーション
+    if (!name) {
       return NextResponse.json(
-        { error: "名前と年齢は必須です" },
+        { error: "名前は必須です" },
+        { status: 400 }
+      );
+    }
+
+    if (isNaN(age)) {
+      return NextResponse.json(
+        { error: "年齢が不正です" },
         { status: 400 }
       );
     }
@@ -38,11 +47,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 🔗 Supabaseクライアント（Service Role使用）
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.SUPABASE_SERVICE_ROLE_KEY
-    );
+    const supabase = createClient(supabaseUrl, serviceKey);
 
     const { data, error } = await supabase
       .from("participants")
@@ -51,14 +56,14 @@ export async function POST(req: NextRequest) {
           name,
           age,
           has_license,
-          license_grade: has_license ? license_grade : null,
+          license_grade,
         },
       ])
       .select()
       .single();
 
     if (error) {
-      console.error("Supabase Insert Error:", error);
+      console.error("SUPABASE ERROR:", error);
       return NextResponse.json(
         { error: error.message },
         { status: 500 }
@@ -70,9 +75,9 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
   } catch (err: any) {
-    console.error("Unexpected Server Error:", err);
+    console.error("UNEXPECTED ERROR:", err);
     return NextResponse.json(
-      { error: "登録処理中にエラーが発生しました" },
+      { error: err.message || "サーバーエラー" },
       { status: 500 }
     );
   }
