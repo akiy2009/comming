@@ -1,12 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import dynamic from "next/dynamic";
 
 export default function Checkin() {
   const scannerRef = useRef<any>(null);
-  const [result, setResult] = useState<string | null>(null);
   const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+  const [message, setMessage] = useState<string>("");
 
   useEffect(() => {
     let mounted = true;
@@ -22,17 +21,44 @@ export default function Checkin() {
           fps: 10,
           qrbox: 250,
         },
-        false // ← これが必要（ビルドエラー対策）
+        false
       );
 
       scanner.render(
-        (decodedText: string) => {
-          if (!result) {
-            setResult(decodedText);
-            setStatus("success");
+        async (decodedText: string) => {
+          try {
+            // QRの中身がURLの場合に対応
+            const id = decodedText.includes("/")
+              ? decodedText.split("/").pop()
+              : decodedText;
 
-            // ここでチェックインAPI叩いてもOK
-            console.log("Scanned:", decodedText);
+            const res = await fetch("/api/checkin", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                decodedText: id,
+              }),
+            });
+
+            const result = await res.json();
+
+            if (!res.ok) {
+              setStatus("error");
+              setMessage(result.error || "チェックイン失敗");
+              return;
+            }
+
+            setStatus("success");
+            setMessage(`${result.user.name} さんチェックイン完了`);
+
+            // スキャン停止（連続実行防止）
+            scanner.clear().catch(() => {});
+          } catch (err) {
+            console.error(err);
+            setStatus("error");
+            setMessage("通信エラー");
           }
         },
         () => {}
@@ -49,7 +75,7 @@ export default function Checkin() {
         scannerRef.current.clear().catch(() => {});
       }
     };
-  }, [result]);
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-6 space-y-6">
@@ -60,15 +86,15 @@ export default function Checkin() {
         className="w-full max-w-md bg-white rounded-xl shadow-md p-4"
       />
 
-      {status === "success" && result && (
+      {status === "success" && (
         <div className="bg-green-100 text-green-700 px-4 py-3 rounded-lg text-sm">
-          読み取り成功：{result}
+          {message}
         </div>
       )}
 
       {status === "error" && (
         <div className="bg-red-100 text-red-700 px-4 py-3 rounded-lg text-sm">
-          読み取り失敗
+          {message}
         </div>
       )}
     </div>
