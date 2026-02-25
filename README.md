@@ -1,3 +1,19 @@
+# Event Entry System
+
+Next.js + Supabase を使った入場管理アプリ
+
+## 機能
+
+- 事前登録
+- QRコード発行
+- 管理画面（検索・フィルター・JST表示）
+- 級別登録
+
+## 技術スタック
+
+- Next.js
+- Supabase
+- Tailwind CSS  
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
