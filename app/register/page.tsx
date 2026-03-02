@@ -128,7 +128,7 @@ export default function RegisterPage() {
                 })
               }
             />
-            資格を持っている
+            アマチュア無線の資格を持っている
           </label>
 
           {form.has_license && (
