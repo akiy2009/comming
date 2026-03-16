@@ -4,7 +4,10 @@ export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // /admin だけ保護
-  if (pathname.startsWith("/admin")) {
+  if (
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/checkin")
+  ){
     const basicAuth = req.headers.get("authorization");
 
     if (basicAuth) {
@@ -32,5 +35,8 @@ export function middleware(req: NextRequest) {
 
 // 対象ルート指定
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: [
+    "/admin/:path*",
+    "/checin/:path*",
+  ],
 };
