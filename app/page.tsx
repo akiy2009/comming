@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
 
 export default function Home() {
   return (
@@ -12,7 +11,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
           <h1 className="text-xl font-bold tracking-wide">イベント受付</h1>
           <Link href="/register">
-            <button className="hidden md:block bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-xl text-sm font-semibold shadow">
+            <button className="hidden md:block bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-xl text-sm font-semibold shadow transition">
               登録
             </button>
           </Link>
@@ -21,11 +20,7 @@ export default function Home() {
 
       {/* ヒーロー */}
       <section className="max-w-6xl mx-auto px-6 py-24 grid md:grid-cols-2 gap-12 items-center">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
-        >
+        <div className="transition-all duration-700 opacity-100 translate-y-0">
           <h2 className="text-4xl md:text-6xl font-extrabold mb-6 leading-tight tracking-tight">
             スムーズな受付を、
             <br />
@@ -39,7 +34,7 @@ export default function Home() {
 
           <div className="flex gap-4 flex-wrap">
             <Link href="/register">
-              <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-10 py-4 rounded-2xl text-lg font-semibold shadow-lg hover:shadow-xl transition-all">
+              <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-10 py-4 rounded-2xl text-lg font-semibold shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition-all">
                 事前登録する →
               </button>
             </Link>
@@ -50,15 +45,10 @@ export default function Home() {
               </button>
             </a>
           </div>
-        </motion.div>
+        </div>
 
         {/* ビジュアルカード */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.7 }}
-          className="bg-white rounded-3xl shadow-2xl p-8 border relative overflow-hidden"
-        >
+        <div className="bg-white rounded-3xl shadow-2xl p-8 border relative overflow-hidden hover:shadow-3xl transition-all duration-500">
           <div className="absolute inset-0 bg-gradient-to-br from-indigo-100 to-transparent opacity-40" />
 
           <div className="relative space-y-4">
@@ -69,7 +59,7 @@ export default function Home() {
               QRコード表示エリア
             </div>
           </div>
-        </motion.div>
+        </div>
       </section>
 
       {/* 開催情報 */}
@@ -84,7 +74,7 @@ export default function Home() {
           ].map((item, i) => (
             <div
               key={i}
-              className="bg-white rounded-2xl p-6 shadow-md border hover:shadow-xl hover:-translate-y-1 transition-all"
+              className="bg-white rounded-2xl p-6 shadow-md border hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
             >
               <div className="text-sm text-gray-500 mb-2">{item.label}</div>
               <div className="text-xl font-semibold">{item.value}</div>
