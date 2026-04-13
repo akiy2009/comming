@@ -25,27 +25,29 @@ export default function Home() {
       {/* Hero */}
       <section className="max-w-6xl mx-auto px-6 py-24 grid md:grid-cols-2 gap-14 items-center">
         <div>
+          <p className="text-indigo-600 text-sm font-medium mb-3">イベント受付システム</p>
+
           <h2 className="text-4xl md:text-5xl font-semibold leading-tight tracking-tight mb-6">
-            スムーズな受付を、
+            QRで、
             <br />
-            <span className="text-indigo-600">もっと直感的に</span>
+            <span className="text-indigo-600">迷わず受付</span>
           </h2>
 
           <p className="text-gray-500 text-lg leading-relaxed mb-10 max-w-lg">
-            QRコードで受付をシンプルに。
-            待ち時間を減らし、イベント体験をより快適にします。
+            事前登録 → QR発行 → 当日提示。
+            シンプルな3ステップでスムーズに受付できます。
           </p>
 
-          <div className="flex gap-4">
+          <div className="flex gap-4 flex-wrap">
             <Link href="/register">
               <button className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-2xl text-base font-medium shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all">
-                事前登録する
+                無料で登録する
               </button>
             </Link>
 
-            <a href="#info">
+            <a href="#flow">
               <button className="border border-gray-300 px-6 py-3 rounded-2xl text-base font-medium hover:bg-gray-100 transition">
-                詳細
+                使い方を見る
               </button>
             </a>
           </div>
@@ -54,7 +56,7 @@ export default function Home() {
         {/* Preview Card */}
         <div className="bg-white/90 backdrop-blur rounded-3xl shadow-xl border border-gray-200/60 p-8">
           <div className="flex items-center justify-between text-xs text-gray-400 mb-4">
-            <span>CHECK-IN</span>
+            <span>CHECK-IN STATUS</span>
             <span className="px-2 py-1 bg-green-100 text-green-600 rounded-md">READY</span>
           </div>
 
@@ -66,8 +68,44 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Flow */}
+      <section id="flow" className="bg-white/60 border-y border-gray-200/60">
+        <div className="max-w-6xl mx-auto px-6 py-20">
+          <h3 className="text-xl font-semibold mb-12 tracking-tight">使い方（3ステップ）</h3>
+
+          <div className="grid md:grid-cols-3 gap-10">
+            {[
+              {
+                title: "事前登録",
+                desc: "フォームに必要事項を入力",
+                icon: "📝",
+              },
+              {
+                title: "QRコード取得",
+                desc: "登録完了後に自動発行",
+                icon: "📱",
+              },
+              {
+                title: "当日提示",
+                desc: "受付でQRを見せるだけ",
+                icon: "🎫",
+              },
+            ].map((step, i) => (
+              <div key={i} className="bg-white/80 backdrop-blur rounded-2xl p-6 border border-gray-200/60 text-center hover:shadow-md transition">
+                <div className="text-4xl mb-4">{step.icon}</div>
+                <div className="w-8 h-8 mx-auto mb-3 rounded-full bg-indigo-600 text-white flex items-center justify-center text-sm font-semibold">
+                  {i + 1}
+                </div>
+                <p className="font-medium mb-1">{step.title}</p>
+                <p className="text-gray-500 text-sm">{step.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Info */}
-      <section id="info" className="max-w-6xl mx-auto px-6 py-20">
+      <section className="max-w-6xl mx-auto px-6 py-20">
         <h3 className="text-xl font-semibold mb-8 tracking-tight">開催情報</h3>
 
         <div className="grid md:grid-cols-3 gap-6">
@@ -87,31 +125,25 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Steps */}
-      <section className="bg-white/60 border-y border-gray-200/60">
-        <div className="max-w-6xl mx-auto px-6 py-20">
-          <h3 className="text-xl font-semibold mb-10 tracking-tight">受付の流れ</h3>
-
-          <div className="grid md:grid-cols-3 gap-10">
-            {[
-              "事前登録",
-              "QRコード取得",
-              "当日提示",
-            ].map((step, i) => (
-              <div key={i} className="text-center">
-                <div className="w-10 h-10 mx-auto mb-3 rounded-full bg-indigo-600 text-white flex items-center justify-center text-sm font-semibold">
-                  {i + 1}
-                </div>
-                <p className="text-gray-600 text-sm">{step}</p>
-              </div>
-            ))}
+      {/* CTA */}
+      <section className="max-w-6xl mx-auto px-6 pb-24">
+        <div className="bg-indigo-600 text-white rounded-3xl p-10 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div>
+            <h4 className="text-xl font-semibold mb-2">今すぐ受付をスムーズに</h4>
+            <p className="text-indigo-100 text-sm">登録は数秒で完了します</p>
           </div>
+
+          <Link href="/register">
+            <button className="bg-white text-indigo-600 px-8 py-3 rounded-2xl font-medium hover:bg-gray-100 transition">
+              登録する
+            </button>
+          </Link>
         </div>
       </section>
 
       {/* Footer */}
       <footer className="text-center text-xs text-gray-400 py-10">
-        © Event Reception System
+        © 高専カンファレンス無線通信IN大阪実行委員会　イベント管理システム
       </footer>
 
     </main>
