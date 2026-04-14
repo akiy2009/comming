@@ -11,7 +11,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-sm font-semibold">QR</div>
-            <h1 className="text-base font-semibold tracking-tight">Event Check-in</h1>
+            <h1 className="text-base font-semibold tracking-tight">参加登録</h1>
           </div>
 
           <Link href="/register">
