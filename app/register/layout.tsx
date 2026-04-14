@@ -4,7 +4,7 @@ export const metadata = {
   openGraph: {
     title: "参加者登録 | Event Check-in",
     description: "QRコードでスムーズなイベント受付を実現",
-    url: "https://your-domain.com/register",
+    url: "https://comming.wirelessconf.com/register",
     siteName: "Event Check-in",
     images: [
       {
