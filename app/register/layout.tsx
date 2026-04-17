@@ -8,7 +8,7 @@ export const metadata = {
     siteName: "Event Check-in",
     images: [
       {
-        url: "https://your-domain.com/ogp.png",
+        url: "https://comming.wirelessconf.com/ogp.jpg",
         width: 1200,
         height: 630,
       },
@@ -20,7 +20,7 @@ export const metadata = {
     card: "summary_large_image",
     title: "参加者登録 | Event Check-in",
     description: "QRコードでスムーズなイベント受付",
-    images: ["https://your-domain.com/ogp.png"],
+    images: ["https://comming.wirelessconf.com/ogp.png"],
   },
 };
 
