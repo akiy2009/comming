@@ -8,7 +8,7 @@ export const metadata = {
     siteName: "Event Check-in",
     images: [
       {
-        url: "https://comming.wirelessconf.com/ogp.jpg", // ← 修正
+        url: "https://comming.wirelessconf.com/ogp.jpg", 
         width: 1200,
         height: 630,
       },
