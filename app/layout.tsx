@@ -8,7 +8,7 @@ export const metadata = {
     siteName: "Event Check-in",
     images: [
       {
-        url: "https:/comming.wirelessconf.com/ogp.jpg",
+        url: "https://comming.wirelessconf.com/ogp.jpg", // ← 修正
         width: 1200,
         height: 630,
       },
@@ -29,5 +29,9 @@ export default function RegisterLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return (
+    <div className="bg-gradient-to-br from-indigo-50 via-white to-indigo-100 min-h-screen">
+      {children}
+    </div>
+  );
 }
